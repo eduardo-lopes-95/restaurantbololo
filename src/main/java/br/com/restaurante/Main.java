@@ -1,10 +1,9 @@
 package br.com.restaurante;
 
+import br.com.restaurante.controller.*;
 import com.google.gson.Gson;
 import org.sql2o.Sql2o;
 import org.sql2o.Connection;
-
-import br.com.restaurante.controller.RestaurantController;
 
 import static spark.Spark.after;
 import static spark.Spark.port;
@@ -23,6 +22,11 @@ public class Main {
         Sql2o sql2o = new Sql2o(connectionString, "", "");
 
         RestaurantController.init(gson, sql2o);
+        AddressController.init(gson, sql2o);
+        ClientController.init(gson, sql2o);
+        OrderController.init(gson, sql2o);
+        ProductController.init(gson, sql2o);
+        OrderProductController.init(gson, sql2o);
 
         conn = sql2o.open();
 
@@ -30,6 +34,25 @@ public class Main {
         RestaurantController.posts();
         RestaurantController.gets();
         RestaurantController.deletes();
+
+        AddressController.posts();
+        AddressController.gets();
+        AddressController.deletes();
+
+        ClientController.posts();
+        ClientController.gets();
+        ClientController.deletes();
+
+        OrderController.posts();
+        OrderController.gets();
+        OrderController.deletes();
+
+        ProductController.posts();
+        ProductController.gets();
+        ProductController.deletes();
+
+        OrderProductController.posts();
+        OrderProductController.gets();
 
         after((req, res) -> {
             res.type("application/json");

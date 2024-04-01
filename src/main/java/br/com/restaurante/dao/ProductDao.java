@@ -1,14 +1,12 @@
 package br.com.restaurante.dao;
 
-import br.com.restaurante.model.Client;
-import br.com.restaurante.model.Order;
 import br.com.restaurante.model.Product;
 
 import java.util.List;
 
 public interface ProductDao {
     // create
-    void add(Product user);
+    void add(Product product);
 
     //read
     List<Product> getAll();

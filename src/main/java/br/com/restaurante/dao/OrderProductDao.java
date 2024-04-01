@@ -1,11 +1,12 @@
 package br.com.restaurante.dao;
 
 import br.com.restaurante.model.Order;
+import br.com.restaurante.model.OrderProduct;
 import br.com.restaurante.model.Product;
 
 import java.util.List;
 
-public interface OrderProduct {
+public interface OrderProductDao {
 
     // create
     void add(OrderProduct orderProduct);
