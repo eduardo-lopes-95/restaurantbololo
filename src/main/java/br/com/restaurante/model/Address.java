@@ -5,7 +5,7 @@ public class Address {
     private String street;
     private String neighborhood;
     private String city;
-    private int zipCode;
+    private String zipCode;
     private String additionalInformation;
 
     public int getId() {
@@ -40,11 +40,11 @@ public class Address {
         this.city = city;
     }
 
-    public int getZipCode() {
+    public String getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(int zipCode) {
+    public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
     }
 

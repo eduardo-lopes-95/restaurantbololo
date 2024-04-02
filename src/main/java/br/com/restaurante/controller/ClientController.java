@@ -1,13 +1,12 @@
 package br.com.restaurante.controller;
 
 import br.com.restaurante.dao.impl.Sql2oClientDao;
-import br.com.restaurante.dao.impl.Sql2oRestaurantDao;
-import br.com.restaurante.model.Address;
 import br.com.restaurante.model.Client;
 import com.google.gson.Gson;
 import org.sql2o.Sql2o;
-
-import static spark.Spark.*;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 public class ClientController {
 
@@ -22,30 +21,45 @@ public class ClientController {
     public ClientController() {
     }
 
-    public static void posts(){
-        post("/client/new", "application/json", (req, res) -> {
-            Client client = gson.fromJson(req.body(), Client.class);
-            clientDao.add(client);
-            res.status(201);
-            return gson.toJson(client);
-        });
-    }
+    public static Route post = (req, res) -> {
+        return AddClient(req, res);
+    };
 
-    public static void gets() {
+    public static Route getById = (req, res) -> {
         // READ
-        get("/client/:id", "application/json", (req, res) -> { // accept a request in format JSON from an app
-            // res.type("application/json");
-            int clientId = Integer.parseInt(req.params("id"));
-            res.type("application/json");
-            return gson.toJson(clientDao.findById(clientId));
-        });
+        return GetClientById(req, res);
+    };
+
+    public static Route getAll = (req, res) -> {
+        // READ
+        return GetAllClients(res);
+    };
+
+    public static Route delete = (req, res) -> {
+        return DeleteClientById(req);
+    };
+
+    private static String DeleteClientById(Request req) {
+        int clientId = Integer.parseInt(req.params("id"));
+        clientDao.deleteById(clientId);
+        return "Client deleted.";
     }
 
-    public static void deletes(){
-        delete("/client/:id", (req, res) -> {
-            int clientId = Integer.parseInt(req.params("id"));
-            clientDao.deleteById(clientId);
-            return "Client deleted.";
-        });
+    private static String AddClient(Request req, Response res) {
+        Client client = gson.fromJson(req.body(), Client.class);
+        clientDao.add(client);
+        res.status(201);
+        return gson.toJson(client);
+    }
+
+    private static String GetClientById(Request req, Response res) {
+        int clientId = Integer.parseInt(req.params("id"));
+        res.type("application/json");
+        return gson.toJson(clientDao.findById(clientId));
+    }
+
+    private static String GetAllClients(Response res) {
+        res.type("application/json");
+        return gson.toJson(clientDao.getAll());
     }
 }

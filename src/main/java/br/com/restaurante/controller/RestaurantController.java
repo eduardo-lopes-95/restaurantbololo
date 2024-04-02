@@ -8,6 +8,9 @@ import br.com.restaurante.dao.impl.Sql2oRestaurantDao;
 import br.com.restaurante.model.Restaurant;
 import com.google.gson.Gson;
 import org.sql2o.Sql2o;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 public class RestaurantController {
     static Gson gson;
@@ -21,36 +24,44 @@ public class RestaurantController {
     public RestaurantController() {
     }
 
-    public static void posts(){
-        post("/restaurants/new", "application/json", (req, res) -> {
-            Restaurant restaurant = gson.fromJson(req.body(), Restaurant.class);
-            restaurantDao.add(restaurant);
-            res.status(201);
-            return gson.toJson(restaurant);
-        });
-    }
+    public static Route post = (req, res) ->{
+        return AddRestaurant(req, res);
+    };
 
-    public static void gets() {
+    public static Route getById = (req, res) -> {
         // READ
+        return GetRestaurantById(req, res);
+    };
 
-        get("/restaurants", "application/json", (req, res) -> { // accept a request in format JSON from an app
-            // res.type("application/json");
-            return gson.toJson(restaurantDao.getAll());// send it back to be displayed
-        });
+    public static Route getAll = (req, res) -> {
+        // READ
+        return GetAllRestaurants();
+    };
 
-        get("/restaurants/:id", "application/json", (req, res) -> { // accept a request in format JSON from an app
-            // res.type("application/json");
-            int restaurantId = Integer.parseInt(req.params("id"));
-            res.type("application/json");
-            return gson.toJson(restaurantDao.findById(restaurantId));
-        });
+    public static Route delete = (req, res) -> {
+        return DeleteRestaurantById(req);
+    };
+
+    private static String DeleteRestaurantById(Request req) {
+        int restaurantId = Integer.parseInt(req.params("id"));
+        restaurantDao.deleteById(restaurantId);
+        return "Restaurant deleted.";
     }
 
-    public static void deletes(){
-        delete("/restaurants/:id", (req, res) -> {
-            int restaurantId = Integer.parseInt(req.params("id"));
-            restaurantDao.deleteById(restaurantId);
-            return "Restaurant deleted.";
-        });
+    private static String AddRestaurant(Request req, Response res) {
+        Restaurant restaurant = gson.fromJson(req.body(), Restaurant.class);
+        restaurantDao.add(restaurant);
+        res.status(201);
+        return gson.toJson(restaurant);
+    }
+
+    private static String GetRestaurantById(Request req, Response res) {
+        int restaurantId = Integer.parseInt(req.params("id"));
+        res.type("application/json");
+        return gson.toJson(restaurantDao.findById(restaurantId));
+    }
+
+    private static String GetAllRestaurants() {
+        return gson.toJson(restaurantDao.getAll());
     }
 }

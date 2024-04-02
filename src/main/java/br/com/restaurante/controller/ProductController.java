@@ -4,8 +4,10 @@ import br.com.restaurante.dao.impl.Sql2oProductDao;
 import br.com.restaurante.model.Product;
 import com.google.gson.Gson;
 import org.sql2o.Sql2o;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
-import static spark.Spark.*;
 
 public class ProductController {
 
@@ -20,30 +22,34 @@ public class ProductController {
     private ProductController() {
     }
 
-    public  static void posts() {
-        post("/products/new", "application/json", (req, res) -> {
-            Product product = gson.fromJson(req.body(), Product.class);
-            productDao.add(product);
-            res.status(201);
-            // res.type("application/json");
-            return gson.toJson(product);
-        });
+    public static Route post = (req, res) ->  {
+        return AddProduct(req, res);
+    };
 
+    public static Route getAll = (req, res) ->  {
+        return GetAllProduct();
+    };
+
+    public static Route delete = (req, res) ->  {
+        return DeleteOrderById(req, res);
+    };
+
+    private static String AddProduct(Request req, Response res) {
+        Product product = gson.fromJson(req.body(), Product.class);
+        productDao.add(product);
+        res.status(201);
+        // res.type("application/json");
+        return gson.toJson(product);
     }
 
-    public static void gets() {
-        get("/products", "application/json", (req, res) -> { // accept a request in format JSON from an app
-            return gson.toJson(productDao.getAll());// send it back to be displayed
-        });
+    private static String GetAllProduct() {
+        return gson.toJson(productDao.getAll());
     }
 
-    public static void deletes() {
-        delete("/products/:id", (req, res) -> {
-            int productId = Integer.parseInt(req.params("id"));
-            productDao.deleteById(productId);
-            res.status(201);
-            return "";
-        });
+    private static String DeleteOrderById(Request req, Response res) {
+        int productId = Integer.parseInt(req.params("id"));
+        productDao.deleteById(productId);
+        res.status(201);
+        return "";
     }
-
 }

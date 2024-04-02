@@ -4,6 +4,7 @@ import br.com.restaurante.controller.*;
 import com.google.gson.Gson;
 import org.sql2o.Sql2o;
 import org.sql2o.Connection;
+import spark.Spark;
 
 import static spark.Spark.after;
 import static spark.Spark.port;
@@ -31,28 +32,37 @@ public class Main {
         conn = sql2o.open();
 
         port(8080);
-        RestaurantController.posts();
-        RestaurantController.gets();
-        RestaurantController.deletes();
 
-        AddressController.posts();
-        AddressController.gets();
-        AddressController.deletes();
+        Spark.get("/", (req, res) -> {return Main.class.getResourceAsStream("/index.html");});
 
-        ClientController.posts();
-        ClientController.gets();
-        ClientController.deletes();
+        Spark.post("restaurant/new", RestaurantController.post);
+        //Spark.get("/restaurant/:id", RestaurantController.getById);
+        Spark.get("/restaurant/list", RestaurantController.getAll);
+        Spark.delete("/restaurant/:id", RestaurantController.delete);
 
-        OrderController.posts();
-        OrderController.gets();
-        OrderController.deletes();
+        Spark.post("address/new/:zipCode", AddressController.post);
+        //Spark.get("/address/:id", AddressController.getById);
+        Spark.get("/address/list", AddressController.getAll);
+        Spark.delete("/address/:id", AddressController.deletes);
 
-        ProductController.posts();
-        ProductController.gets();
-        ProductController.deletes();
+        Spark.post("client/new", ClientController.post);
+        //Spark.get("/client/:id", ClientController.getById);
+        Spark.get("/client/list", ClientController.getAll);
+        Spark.delete("/client/:id", ClientController.delete);
 
-        OrderProductController.posts();
-        OrderProductController.gets();
+        Spark.post("order/new", OrderController.post);
+        //Spark.get("/order/:id/", OrderController.getById);
+        Spark.get("/order/list", OrderController.getAll);
+        Spark.delete("/order/:id", OrderController.delete);
+
+        Spark.post("product/new", ProductController.post);
+        Spark.get("/product/list", ProductController.getAll);
+        Spark.delete("/product/:id", ProductController.delete);
+
+        Spark.post("orderproduct/new", OrderProductController.post);
+        Spark.get("/orderproduct/list", OrderProductController.getAll);
+        Spark.get("/orders/:id/products", OrderProductController.GetProductsByOrder);
+        Spark.get("/products/:id/orders", OrderProductController.GetOrderByProduct);
 
         after((req, res) -> {
             res.type("application/json");

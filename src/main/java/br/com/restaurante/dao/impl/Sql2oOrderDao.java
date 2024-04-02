@@ -1,6 +1,7 @@
 package br.com.restaurante.dao.impl;
 
 import br.com.restaurante.dao.OrderDao;
+import br.com.restaurante.dao.OrderProductDao;
 import br.com.restaurante.model.Client;
 import br.com.restaurante.model.Order;
 import org.sql2o.Connection;
@@ -20,8 +21,8 @@ public class Sql2oOrderDao implements OrderDao {
     @Override
     public void add(Order order) {
         String sql = "INSERT INTO orders "
-                + "(id, clientId, addressId, orderDate, orderStatus) "
-                + "VALUES (:id, :clientId, :addressId, :orderDate, :orderStatus)";
+                + "(clientId, addressId, orderDate, orderStatus) "
+                + "VALUES (:clientId, :addressId, :orderDate, :orderStatus)";
 
         try (Connection con = sql2o.open()) {
             int id = (int) con.createQuery(sql, true).bind(order).executeUpdate().getKey();

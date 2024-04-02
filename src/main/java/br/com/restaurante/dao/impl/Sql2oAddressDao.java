@@ -2,9 +2,12 @@ package br.com.restaurante.dao.impl;
 
 import br.com.restaurante.dao.AddressDao;
 import br.com.restaurante.model.Address;
+import br.com.restaurante.model.Client;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
+
+import java.util.List;
 
 public class Sql2oAddressDao implements AddressDao {
 
@@ -16,8 +19,8 @@ public class Sql2oAddressDao implements AddressDao {
 
     @Override
     public void add(Address address) {
-        String sql = "INSERT INTO addresses (id, street, neighborhood, city, zipCode, additionalInformation) " +
-                     "VALUES (:id, :street, :neighborhood, :city, :zipCode, :additionalInformation)";
+        String sql = "INSERT INTO addresses (street, neighborhood, city, zipCode, additionalInformation) " +
+                     "VALUES (:street, :neighborhood, :city, :zipCode, :additionalInformation)";
         try (Connection con = sql2o.open()) {
             int id = (int) con.createQuery(sql, true)
                     .bind(address)
@@ -47,6 +50,14 @@ public class Sql2oAddressDao implements AddressDao {
                     .executeUpdate();
         } catch (Sql2oException ex) {
             System.out.println(ex);
+        }
+    }
+
+    @Override
+    public List<Address> getAll() {
+        try(Connection con = sql2o.open()){
+            return con.createQuery("SELECT * FROM addresses")
+                    .executeAndFetch(Address.class);
         }
     }
 }

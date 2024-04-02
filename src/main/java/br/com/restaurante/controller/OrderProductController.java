@@ -6,6 +6,9 @@ import br.com.restaurante.model.OrderProduct;
 import br.com.restaurante.model.Product;
 import com.google.gson.Gson;
 import org.sql2o.Sql2o;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 import java.util.List;
 
@@ -23,43 +26,52 @@ public class OrderProductController {
     private OrderProductController() {
     }
 
-    public  static void posts() {
-        post("/ordersproducts/new", "application/json", (req, res) -> {
-            OrderProduct orderProduct = gson.fromJson(req.body(), OrderProduct.class);
-            ordertProductDao.add(orderProduct);
-            res.status(201);
-            return gson.toJson(orderProduct);
-        });
+    public static Route post = (req, res) -> {
+        return AddOrderProduct(req, res);
+    };
 
+    public static Route getAll = (req, res) -> {
+        return GetAllOrderProduct();
+    };
+
+    public static Route GetProductsByOrder = (req, res) -> {
+        return GetProductByOrderId(req);
+    };
+
+    public static Route GetOrderByProduct = (req, res) -> {
+        return GetOrderByProductId(req);
+    };
+
+    private static String AddOrderProduct(Request req, Response res) {
+        OrderProduct orderProduct = gson.fromJson(req.body(), OrderProduct.class);
+        ordertProductDao.add(orderProduct);
+        res.status(201);
+        return gson.toJson(orderProduct);
     }
 
-    public static void gets() {
+    private static String GetOrderByProductId(Request req) throws Exception {
+        int productId = Integer.parseInt(req.params("id"));
+        List<Order> orderByProduct = ordertProductDao.findAllByProductId(productId);
 
-        get("/ordersproducts", "application/json", (req, res) -> {
-            return gson.toJson(ordertProductDao.getAll());
-        });
+        if (orderByProduct == null) {
+            throw new Exception(String.format("No order with product id: \"%s\" exists", req.params("id")));
+        } else {
+            return gson.toJson(orderByProduct);
+        }
+    }
 
-        get("/orders/:id/products", "application/json", (req, res) -> { // accept a request in format JSON from an app
-            int orderId = Integer.parseInt(req.params("id"));
-            List<Product> productsByOrder = ordertProductDao.findAllByOrderId(orderId);
+    private static String GetProductByOrderId(Request req) throws Exception {
+        int orderId = Integer.parseInt(req.params("id"));
+        List<Product> productsByOrder = ordertProductDao.findAllByOrderId(orderId);
 
-            if (productsByOrder == null) {
-                throw new Exception(String.format("No product to the order id: \"%s\" exists", req.params("id")));
-            } else {
-                return gson.toJson(productsByOrder);
-            }
-        });
+        if (productsByOrder == null) {
+            throw new Exception(String.format("No product to the order id: \"%s\" exists", req.params("id")));
+        } else {
+            return gson.toJson(productsByOrder);
+        }
+    }
 
-        get("/products/:id/orders", "application/json", (req, res) -> { // accept a request in format JSON from an app
-            int productId = Integer.parseInt(req.params("id"));
-            List<Order> orderByProduct = ordertProductDao.findAllByProductId(productId);
-
-            if (orderByProduct == null) {
-                throw new Exception(String.format("No order with product id: \"%s\" exists", req.params("id")));
-            } else {
-                return gson.toJson(orderByProduct);
-            }
-        });
-
+    private static String GetAllOrderProduct() {
+        return gson.toJson(ordertProductDao.getAll());
     }
 }

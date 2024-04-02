@@ -4,6 +4,9 @@ import br.com.restaurante.dao.impl.Sql2oOrderDao;
 import br.com.restaurante.model.Order;
 import com.google.gson.Gson;
 import org.sql2o.Sql2o;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
 import static spark.Spark.*;
 
@@ -20,40 +23,49 @@ public class OrderController {
     public OrderController() {
     }
 
-    public  static void posts() {
-        post("/orders/new", "application/json", (req, res) -> {
-            Order order = gson.fromJson(req.body(), Order.class);
-            orderDao.add(order);
-            res.status(201);
-            // res.type("application/json");
+    public  static Route post = (req, res) ->{
+        return AddOrder(req, res);
+    };
+
+    public static Route getAll = (req, res) -> {
+        return GetAllOrders();
+    };
+
+    public static Route getById = (req, res) -> {
+        return GetOrderById(req);
+    };
+
+    private static String GetAllOrders() {
+        return gson.toJson(orderDao.getAll());
+    }
+
+    private static String GetOrderById(Request req) throws Exception {
+        int orderId = Integer.parseInt(req.params("id"));
+        Order order = orderDao.findById(orderId);
+        if (order == null) {
+            throw new Exception(String.format("No order with the id: \"%s\" exists", req.params("id")));
+        } else {
             return gson.toJson(order);
-        });
-
+        }
     }
 
-    public static void gets() {
-        get("/orders", "application/json", (req, res) -> { // accept a request in format JSON from an app
-            return gson.toJson(orderDao.getAll());// send it back to be displayed
-        });
+    public static Route delete = (req, res) -> {
+        return DeleteOrderById(req, res);
+    };
 
-        get("/orders/:id", "application/json", (req, res) -> {
-            int orderId = Integer.parseInt(req.params("id"));
-            Order order = orderDao.findById(orderId);
-            if (order == null) {
-                throw new Exception(String.format("No order with the id: \"%s\" exists", req.params("id")));
-            } else {
-                return gson.toJson(order);
-            }
-        });
+    private static String DeleteOrderById(Request req, Response res) {
+        int productId = Integer.parseInt(req.params("id"));
+        orderDao.deleteById(productId);
+        res.status(201);
+        return "";
     }
 
-    public static void deletes() {
-        delete("/orders/:id", (req, res) -> {
-            int productId = Integer.parseInt(req.params("id"));
-            orderDao.deleteById(productId);
-            res.status(201);
-            return "";
-        });
+    private static String AddOrder(Request req, Response res) {
+        Order order = gson.fromJson(req.body(), Order.class);
+        orderDao.add(order);
+        res.status(201);
+        // res.type("application/json");
+        return gson.toJson(order);
     }
 }
 

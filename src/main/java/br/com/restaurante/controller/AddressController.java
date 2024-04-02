@@ -2,10 +2,15 @@ package br.com.restaurante.controller;
 
 import br.com.restaurante.dao.impl.Sql2oAddressDao;
 import br.com.restaurante.model.Address;
+import br.com.restaurante.service.ZipcodeServiceImpl;
+import br.com.restaurante.shared.ViaCepZipCodeDto;
 import com.google.gson.Gson;
 import org.sql2o.Sql2o;
+import spark.Request;
+import spark.Response;
+import spark.Route;
 
-import static spark.Spark.*;
+import java.io.IOException;
 
 public class AddressController {
 
@@ -20,30 +25,62 @@ public class AddressController {
     public AddressController() {
     }
 
-    public static void posts(){
-        post("/address/new", "application/json", (req, res) -> {
-            Address address = gson.fromJson(req.body(), Address.class);
-            addressDao.add(address);
-            res.status(201);
-            return gson.toJson(address);
-        });
-    }
+    public static Route post = (req, res) -> {
+        return AddNewAddress(req, res);
+    };
 
-    public static void gets() {
+    public static Route getById = (req, res) -> {
         // READ
-        get("/address/:id", "application/json", (req, res) -> { // accept a request in format JSON from an app
-            // res.type("application/json");
-            int addressId = Integer.parseInt(req.params("id"));
-            res.type("application/json");
-            return gson.toJson(addressDao.findById(addressId));
-        });
+        return GetAddressById(req, res);
+    };
+
+    public static Route getAll = (req, res) -> {
+        // READ
+        return GetAllAddresses(res);
+    };
+
+    public static Route deletes = (req, res) -> {
+        return DeleteAddress(req);
+    };
+
+    private static String DeleteAddress(Request req) {
+        int addressId = Integer.parseInt(req.params("id"));
+        addressDao.deleteById(addressId);
+        return "Address deleted.";
     }
 
-    public static void deletes(){
-        delete("/address/:id", (req, res) -> {
-            int addressId = Integer.parseInt(req.params("id"));
-            addressDao.deleteById(addressId);
-            return "Address deleted.";
-        });
+    private static String GetAddressById(Request req, Response res) {
+        int addressId = Integer.parseInt(req.params("id"));
+        res.type("application/json");
+        return gson.toJson(addressDao.findById(addressId));
+    }
+
+    private static String AddNewAddress(Request req, Response res) {
+        String cep = req.params("zipCode");
+        ViaCepZipCodeDto dto;
+        try {
+            dto = new ZipcodeServiceImpl().GetZipCode(cep);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        Address address = new Address();
+        address.setZipCode(dto.cep.replace("-",""));
+        address.setCity(dto.localidade);
+        address.setStreet(dto.logradouro);
+        address.setNeighborhood(dto.bairro);
+        address.setAdditionalInformation(dto.complemento);
+
+        addressDao.add(address);
+
+        res.status(201);
+        return gson.toJson(address);
+    }
+
+    private static String GetAllAddresses(Response res) {
+        res.type("application/json");
+        return gson.toJson(addressDao.getAll());
     }
 }

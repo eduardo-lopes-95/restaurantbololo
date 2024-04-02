@@ -18,7 +18,7 @@ public class Sql2oRestaurantDao implements RestaurantDao {
 
     @Override
     public void add(Restaurant restaurant) {
-        String sql = "INSERT INTO restaurants (id, name, addressId, phone) VALUES (:id, :name, :addressId, :phone)";
+        String sql = "INSERT INTO restaurants (name, addressId, phone) VALUES (:name, :addressId, :phone)";
         try (Connection con = sql2o.open()) {
             int id = (int) con.createQuery(sql, true)
                     .bind(restaurant)
