@@ -8,6 +8,18 @@ public class Address {
     private String zipCode;
     private String additionalInformation;
 
+    public Address() {
+    }
+
+    public Address(int id, String street, String neighborhood, String city, String zipCode, String additionalInformation) {
+        this.id = id;
+        this.street = street;
+        this.neighborhood = neighborhood;
+        this.city = city;
+        this.zipCode = zipCode;
+        this.additionalInformation = additionalInformation;
+    }
+
     public int getId() {
         return id;
     }

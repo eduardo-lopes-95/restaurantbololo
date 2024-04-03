@@ -23,7 +23,7 @@ public class OrderProductController {
         ordertProductDao = new Sql2oOrderProductDao(sql2o);
     }
 
-    private OrderProductController() {
+    public OrderProductController() {
     }
 
     public static Route post = (req, res) -> {
@@ -42,14 +42,14 @@ public class OrderProductController {
         return GetOrderByProductId(req);
     };
 
-    private static String AddOrderProduct(Request req, Response res) {
+    public static String AddOrderProduct(Request req, Response res) {
         OrderProduct orderProduct = gson.fromJson(req.body(), OrderProduct.class);
         ordertProductDao.add(orderProduct);
         res.status(201);
         return gson.toJson(orderProduct);
     }
 
-    private static String GetOrderByProductId(Request req) throws Exception {
+    public static String GetOrderByProductId(Request req) throws Exception {
         int productId = Integer.parseInt(req.params("id"));
         List<Order> orderByProduct = ordertProductDao.findAllByProductId(productId);
 
@@ -60,7 +60,7 @@ public class OrderProductController {
         }
     }
 
-    private static String GetProductByOrderId(Request req) throws Exception {
+    public static String GetProductByOrderId(Request req) throws Exception {
         int orderId = Integer.parseInt(req.params("id"));
         List<Product> productsByOrder = ordertProductDao.findAllByOrderId(orderId);
 
@@ -71,7 +71,7 @@ public class OrderProductController {
         }
     }
 
-    private static String GetAllOrderProduct() {
+    public static String GetAllOrderProduct() {
         return gson.toJson(ordertProductDao.getAll());
     }
 }

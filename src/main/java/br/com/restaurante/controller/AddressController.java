@@ -43,19 +43,19 @@ public class AddressController {
         return DeleteAddress(req);
     };
 
-    private static String DeleteAddress(Request req) {
+    public static String DeleteAddress(Request req) {
         int addressId = Integer.parseInt(req.params("id"));
         addressDao.deleteById(addressId);
         return "Address deleted.";
     }
 
-    private static String GetAddressById(Request req, Response res) {
+    public static String GetAddressById(Request req, Response res) {
         int addressId = Integer.parseInt(req.params("id"));
         res.type("application/json");
         return gson.toJson(addressDao.findById(addressId));
     }
 
-    private static String AddNewAddress(Request req, Response res) {
+    public static String AddNewAddress(Request req, Response res) {
         String cep = req.params("zipCode");
         ViaCepZipCodeDto dto;
         try {
@@ -79,7 +79,7 @@ public class AddressController {
         return gson.toJson(address);
     }
 
-    private static String GetAllAddresses(Response res) {
+    public static String GetAllAddresses(Response res) {
         res.type("application/json");
         return gson.toJson(addressDao.getAll());
     }

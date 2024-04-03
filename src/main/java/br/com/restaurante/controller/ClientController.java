@@ -39,26 +39,26 @@ public class ClientController {
         return DeleteClientById(req);
     };
 
-    private static String DeleteClientById(Request req) {
+    public static String DeleteClientById(Request req) {
         int clientId = Integer.parseInt(req.params("id"));
         clientDao.deleteById(clientId);
         return "Client deleted.";
     }
 
-    private static String AddClient(Request req, Response res) {
+    public static String AddClient(Request req, Response res) {
         Client client = gson.fromJson(req.body(), Client.class);
         clientDao.add(client);
         res.status(201);
         return gson.toJson(client);
     }
 
-    private static String GetClientById(Request req, Response res) {
+    public static String GetClientById(Request req, Response res) {
         int clientId = Integer.parseInt(req.params("id"));
         res.type("application/json");
         return gson.toJson(clientDao.findById(clientId));
     }
 
-    private static String GetAllClients(Response res) {
+    public static String GetAllClients(Response res) {
         res.type("application/json");
         return gson.toJson(clientDao.getAll());
     }

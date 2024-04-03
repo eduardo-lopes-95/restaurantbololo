@@ -19,7 +19,7 @@ public class ProductController {
         productDao = new Sql2oProductDao(sql2o);
     }
 
-    private ProductController() {
+    public ProductController() {
     }
 
     public static Route post = (req, res) ->  {
@@ -34,7 +34,7 @@ public class ProductController {
         return DeleteOrderById(req, res);
     };
 
-    private static String AddProduct(Request req, Response res) {
+    public static String AddProduct(Request req, Response res) {
         Product product = gson.fromJson(req.body(), Product.class);
         productDao.add(product);
         res.status(201);
@@ -42,11 +42,11 @@ public class ProductController {
         return gson.toJson(product);
     }
 
-    private static String GetAllProduct() {
+    public static String GetAllProduct() {
         return gson.toJson(productDao.getAll());
     }
 
-    private static String DeleteOrderById(Request req, Response res) {
+    public static String DeleteOrderById(Request req, Response res) {
         int productId = Integer.parseInt(req.params("id"));
         productDao.deleteById(productId);
         res.status(201);

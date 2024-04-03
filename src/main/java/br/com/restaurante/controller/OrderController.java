@@ -35,11 +35,15 @@ public class OrderController {
         return GetOrderById(req);
     };
 
-    private static String GetAllOrders() {
+    public static Route delete = (req, res) -> {
+        return DeleteOrderById(req, res);
+    };
+
+    public static String GetAllOrders() {
         return gson.toJson(orderDao.getAll());
     }
 
-    private static String GetOrderById(Request req) throws Exception {
+    public static String GetOrderById(Request req) throws Exception {
         int orderId = Integer.parseInt(req.params("id"));
         Order order = orderDao.findById(orderId);
         if (order == null) {
@@ -49,18 +53,14 @@ public class OrderController {
         }
     }
 
-    public static Route delete = (req, res) -> {
-        return DeleteOrderById(req, res);
-    };
-
-    private static String DeleteOrderById(Request req, Response res) {
+    public static String DeleteOrderById(Request req, Response res) {
         int productId = Integer.parseInt(req.params("id"));
         orderDao.deleteById(productId);
         res.status(201);
         return "";
     }
 
-    private static String AddOrder(Request req, Response res) {
+    public static String AddOrder(Request req, Response res) {
         Order order = gson.fromJson(req.body(), Order.class);
         orderDao.add(order);
         res.status(201);
